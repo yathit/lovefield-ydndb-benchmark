@@ -103,5 +103,5 @@ req.then(function() {
 
 	});
 }, function(e) {
-	throw e;
+	console.error(e);
 });
