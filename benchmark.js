@@ -59,7 +59,7 @@ schemaBuilder.connect().then(function(db) {
 		.where(article.license.eq('SA')
 			.and(article.publisher.eq('Science'))
 			.and(article.year.eq(2006)))
-		.orderBy(article.title).exec();
+		.orderBy(article.title).limit(20).exec();
 }).then(function(row) {
 	console.log(row);
 	disp('Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
@@ -79,6 +79,8 @@ var ydb = new ydn.db.Storage('benchmark-ydn', {
 			keyPath: ['publisher', 'title']
 		}, {
 			keyPath: ['year', 'title']
+		}, {
+			keyPath: ['license', 'publisher', 'year', 'title']
 		}]
 	}]
 });
@@ -90,7 +92,7 @@ var iters = [ydn.db.IndexIterator.where('article', 'license, title', '^', ['SA']
 	ydn.db.IndexIterator.where('article', 'publisher, title', '^', ['Science']),
 	ydn.db.IndexIterator.where('article', 'year, title', '^', [2006])];
 var match_keys = [];
-var solver = new ydn.db.algo.ZigzagMerge(match_keys);
+var solver = new ydn.db.algo.ZigzagMerge(match_keys, 20);
 var req = ydb.scan(solver, iters);
 req.then(function() {
 	ydb.values('article', match_keys).done(function(row) {
@@ -98,6 +100,16 @@ req.then(function() {
 		console.log(row);
 		disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
 			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
+
+		console.time('ydn2');
+		var kr = ydn.db.KeyRange.starts(['SA', 'Science', 2006]);
+		ydb.valuesByIndex('article', 'license, publisher, year, title', kr, 20).done(function(arr) {
+			console.timeEnd('ydn2');
+			console.log(arr);
+			disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
+				arr.length + ' articles from ' + arr[0].title + ' to ' + arr[arr.length - 1].title);
+
+		})
 
 	});
 }, function(e) {
