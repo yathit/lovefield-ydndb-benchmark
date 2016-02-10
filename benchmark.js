@@ -85,12 +85,12 @@ var ydb = new ydn.db.Storage('benchmark-ydn', {
 
 ydb.putAll('article', data);
 
+console.time('ydn');
 var iters = [ydn.db.IndexIterator.where('article', 'license, title', '^', ['SA']),
 	ydn.db.IndexIterator.where('article', 'publisher, title', '^', ['Science']),
 	ydn.db.IndexIterator.where('article', 'year, title', '^', [2006])];
 var match_keys = [];
 var solver = new ydn.db.algo.ZigzagMerge(match_keys);
-console.time('ydn');
 var req = ydb.scan(solver, iters);
 req.then(function() {
 	ydb.values('article', match_keys).done(function(row) {
