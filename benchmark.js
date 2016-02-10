@@ -23,9 +23,13 @@ for (var i = 0; i < 20000; i++) {
 	})
 }
 
-var p = document.createElement('p');
-p.textContent = 'Begin: ' + new Date().toLocaleTimeString();
-document.body.appendChild(p);
+var disp = function(msg) {
+	var p = document.createElement('p');
+	p.textContent = msg;
+	document.body.appendChild(p);
+};
+disp('Begin: ' + new Date().toLocaleTimeString());
+
 
 // Lovefield, give a little head start ;-)
 var schemaBuilder = lf.schema.create('benchmark-lf', 1);
@@ -63,11 +67,8 @@ schemaBuilder.connect().then(function(db) {
 }).then(function(results) {
 	results.forEach(function(row) {
 		console.log(row);
-		var msg = 'Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
-			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title;
-		var p = document.createElement('p');
-		p.textContent = msg;
-		document.body.appendChild(p);
+		disp('Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
+			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
 	});
 });
 
@@ -98,11 +99,10 @@ var req = ydb.scan(solver, iters);
 req.then(function() {
 	ydb.values('article', match_keys).done(function(row) {
 		console.log(row);
-		var msg = 'YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
-			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title;
-		var p = document.createElement('p');
-		p.textContent = msg;
-		document.body.appendChild(p);	});
+		disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
+			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
+
+	});
 }, function(e) {
 	throw e;
 });
