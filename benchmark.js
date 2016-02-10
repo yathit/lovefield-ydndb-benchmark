@@ -60,13 +60,11 @@ schemaBuilder.connect().then(function(db) {
 			.and(article.publisher.eq('Science'))
 			.and(article.year.eq(2006)))
 		.orderBy(article.title).exec();
-}).then(function(results) {
-	results.forEach(function(row) {
-		console.log(row);
-		disp('Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
-			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
-		console.timeEnd('lf');
-	});
+}).then(function(row) {
+	console.log(row);
+	disp('Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
+		row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
+	console.timeEnd('lf');
 });
 
 
