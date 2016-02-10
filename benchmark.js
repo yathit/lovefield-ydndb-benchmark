@@ -7,7 +7,7 @@ var data = [];
 var licenses = ['SA', 'CA', 'CC', 'NC'];
 var publishers = ['AMC', 'Science', 'Nature', 'PlosOne', 'BMC', 'SAM', 'APress', 'Pocket'];
 var years = [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009];
-for (var i = 0; i < 50000; i++) {
+for (var i = 0; i < 50; i++) {
 	var d = i;
 	var title = 'xxxxxxxx'.replace(/x/g, function(c) {
 		var r = (d + Math.random() * 16) % 16 | 0;
@@ -90,9 +90,9 @@ var iters = [ydn.db.IndexIterator.where('article', 'license, title', '^', ['SA']
 	ydn.db.IndexIterator.where('article', 'year, title', '^', [2006])];
 var match_keys = [];
 var solver = new ydn.db.algo.ZigzagMerge(match_keys);
+console.time('ydn');
 var req = ydb.scan(solver, iters);
 req.then(function() {
-	console.time('ydn');
 	ydb.values('article', match_keys).done(function(row) {
 		console.timeEnd('ydn');
 		console.log(row);
