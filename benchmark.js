@@ -59,7 +59,7 @@ schemaBuilder.connect().then(function(db) {
 		.where(article.license.eq('SA')
 			.and(article.publisher.eq('Science'))
 			.and(article.year.eq(2006)))
-		.orderBy(a.title).exec();
+		.orderBy(article.title).exec();
 }).then(function(results) {
 	results.forEach(function(row) {
 		console.log(row);
