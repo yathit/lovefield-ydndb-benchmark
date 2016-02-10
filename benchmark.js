@@ -85,33 +85,34 @@ var ydb = new ydn.db.Storage('benchmark-ydn', {
 	}]
 });
 
-ydb.putAll('article', data);
+ydb.putAll('article', data).done(function() {
 
-console.time('ydn');
-var iters = [ydn.db.IndexIterator.where('article', 'license, title', '^', ['SA']),
-	ydn.db.IndexIterator.where('article', 'publisher, title', '^', ['Science']),
-	ydn.db.IndexIterator.where('article', 'year, title', '^', [2006])];
-var match_keys = [];
-var solver = new ydn.db.algo.ZigzagMerge(match_keys, 20);
-var req = ydb.scan(solver, iters);
-req.then(function() {
-	ydb.values('article', match_keys).done(function(row) {
-		console.timeEnd('ydn');
-		console.log(row);
-		disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
-			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
-
-		console.time('ydn2');
-		var kr = ydn.db.KeyRange.starts(['SA', 'Science', 2006]);
-		ydb.valuesByIndex('article', 'license, publisher, year, title', kr, 20).done(function(arr) {
-			console.timeEnd('ydn2');
-			console.log(arr);
+	console.time('ydn');
+	var iters = [ydn.db.IndexIterator.where('article', 'license, title', '^', ['SA']),
+		ydn.db.IndexIterator.where('article', 'publisher, title', '^', ['Science']),
+		ydn.db.IndexIterator.where('article', 'year, title', '^', [2006])];
+	var match_keys = [];
+	var solver = new ydn.db.algo.ZigzagMerge(match_keys, 20);
+	var req = ydb.scan(solver, iters);
+	req.then(function() {
+		ydb.values('article', match_keys).done(function(row) {
+			console.timeEnd('ydn');
+			console.log(row);
 			disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
-				arr.length + ' articles from ' + arr[0].title + ' to ' + arr[arr.length - 1].title);
+				row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
 
-		})
+			console.time('ydn2');
+			var kr = ydn.db.KeyRange.starts(['SA', 'Science', 2006]);
+			ydb.valuesByIndex('article', 'license, publisher, year, title', kr, 20).done(function(arr) {
+				console.timeEnd('ydn2');
+				console.log(arr);
+				disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
+					arr.length + ' articles from ' + arr[0].title + ' to ' + arr[arr.length - 1].title);
 
+			})
+
+		});
+	}, function(e) {
+		console.error(e);
 	});
-}, function(e) {
-	console.error(e);
 });
