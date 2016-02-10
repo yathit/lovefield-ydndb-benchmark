@@ -7,7 +7,7 @@ var data = [];
 var licenses = ['SA', 'CA', 'CC', 'NC'];
 var publishers = ['AMC', 'Science', 'Nature', 'PlosOne', 'BMC', 'SAM', 'APress', 'Pocket'];
 var years = [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009];
-for (var i = 0; i < 20000; i++) {
+for (var i = 0; i < 50000; i++) {
 	var d = i;
 	var title = 'xxxxxxxx'.replace(/x/g, function(c) {
 		var r = (d + Math.random() * 16) % 16 | 0;
@@ -59,6 +59,7 @@ schemaBuilder.connect().then(function(db) {
 	}
 	return db.insertOrReplace().into(article).values(rows).exec();
 }).then(function() {
+	console.time('lf');
 	return todoDb.select().from(article)
 		.where(article.license.eq('SA')
 			.and(article.publisher.eq('Science'))
@@ -69,6 +70,7 @@ schemaBuilder.connect().then(function(db) {
 		console.log(row);
 		disp('Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
 			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
+		console.timeEnd('lf');
 	});
 });
 
@@ -97,7 +99,9 @@ var match_keys = [];
 var solver = new ydn.db.algo.ZigzagMerge(match_keys);
 var req = ydb.scan(solver, iters);
 req.then(function() {
+	console.time('ydn');
 	ydb.values('article', match_keys).done(function(row) {
+		console.timeEnd('ydn');
 		console.log(row);
 		disp('YDN-DB' + ' ' + new Date().toLocaleTimeString() + ' ' +
 			row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
