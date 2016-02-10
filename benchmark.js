@@ -50,12 +50,7 @@ schemaBuilder.connect().then(function(db) {
 	article = db.getSchema().table('article');
 	var rows = [];
 	for (var i = 0; i < data.length; i++) {
-		rows.push(article.createRow({
-			'id': 1,
-			'description': 'Get a cup of coffee',
-			'deadline': new Date(),
-			'done': false
-		}));
+		rows.push(article.createRow(data[i]));
 	}
 	return db.insertOrReplace().into(article).values(rows).exec();
 }).then(function() {
