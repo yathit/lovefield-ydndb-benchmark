@@ -31,7 +31,7 @@ var disp = function(msg) {
 disp('Begin: ' + new Date().toLocaleTimeString());
 
 
-// Lovefield, give a little head start ;-)
+// Lovefield
 var schemaBuilder = lf.schema.create('benchmark-lf', 1);
 
 schemaBuilder.createTable('article').
@@ -56,15 +56,13 @@ schemaBuilder.connect().then(function(db) {
 }).then(function() {
 	console.time('lf');
 	return todoDb.select().from(article)
-		.where(article.license.eq('SA')
-			.and(article.publisher.eq('Science'))
-			.and(article.year.eq(2006)))
-		.orderBy(article.title).limit(20).exec();
+			.where(lf.op.and(article.license.eq('SA'), lf.op.and(article.publisher.eq('Science'), article.year.eq(2006))))
+			.orderBy(article.title).limit(20).exec();
 }).then(function(row) {
+	console.timeEnd('lf');
 	console.log(row);
 	disp('Lovefield' + ' ' + new Date().toLocaleTimeString() + ' ' +
 		row.length + ' articles from ' + row[0].title + ' to ' + row[row.length - 1].title);
-	console.timeEnd('lf');
 });
 
 
