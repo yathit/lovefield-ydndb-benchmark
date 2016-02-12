@@ -41,9 +41,9 @@ var loadLf = function() {
   addColumn('year', lf.Type.INTEGER).
   addColumn('title', lf.Type.STRING).
   addPrimaryKey(['id']).
-  addIndex('licensetitle', ['license', 'title'], false, lf.Order.ASC).
-  addIndex('publishertitle', ['publisher', 'title'], false, lf.Order.ASC).
-  addIndex('yeartitle', ['year', 'title'], false, lf.Order.ASC);
+  addIndex('idx_license', ['license'], false, lf.Order.ASC).
+  addIndex('idx_publisher', ['publisher'], false, lf.Order.ASC).
+  addIndex('idx_year', ['year'], false, lf.Order.ASC);
   return schemaBuilder.connect().then(function(db) {
     lfDb = db;
     article = db.getSchema().table('article');
@@ -57,10 +57,16 @@ var loadLf = function() {
 
 var runLf = function(db) {
     var article = db.getSchema().table('article');
-    return lfDb.select().from(article)
-        .where(lf.op.and(article.license.eq('SA'), lf.op.and(article.publisher.eq('Science'), article.year.eq(2006))))
-        .orderBy(article.title).limit(20)
-        .exec();
+  var q = db.select()
+      .from(article)
+      .where(lf.op.and(
+          article.license.eq('SA'),
+          article.publisher.eq('Science'),
+          article.year.eq(2006)))
+      .orderBy(article.title)
+      .limit(20);
+  // console.log(q.explain());
+  return q.exec();
 };
 
 var loadYdn = function() {
